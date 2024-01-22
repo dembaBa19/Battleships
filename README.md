@@ -23,9 +23,9 @@ It thinks like this :
   
   Combined maximum distance in each of the 4 directions until we hit the end of the grid or a square that isn't free (basically anything that isn't an unknown square anymore, such as a "*" - a known nothing square) + the minimum distance to the closest such wall (this distance is added again to give central squares an edge over non-central ones in the evaluation). Here we see the algorithm work for the square [5, 3], which we have marked as "E" in this visualization and the paths in each direction with "-"s. 
   
-  0  1  2  3  4  5  6  7  8  9                     0  1  2  3  4  5  6  7  8  9
+  0  1  2  3  4  5  6  7  8  9  -------------->  0  1  2  3  4  5  6  7  8  9
   
-  ------------------------------                  ------------------------------
+  -----------------------------|                  ------------------------------
   
 0|#  #  #  #  #  #  #  #  #  # -------------->  0|18 18 18 11 12 13 18 18 18 18
 
