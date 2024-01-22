@@ -23,14 +23,14 @@ It thinks like this :
   
   Combined maximum distance in each of the 4 directions until we hit the end of the grid or a square that isn't free (basically anything that isn't an unknown square anymore, such as a "*" - a known nothing square) + the minimum distance to the closest such wall (this distance is added again to give central squares an edge over non-central ones in the evaluation). Here we see the algorithm work for the square [5, 3], which we have marked as "E" in this visualization and the paths in each direction with "-"s. 
   
-  0  1  2  3  4  5  6  7  8  9  -------------->  0  1  2  3  4  5  6  7  8  9                                                                                     
+  0  1  2  3  4  5  6  7  8  9  -------------->  0  1  2  3  4  5  6  7  8  9                                                                                       
   ----------------------------- -------------->  ------------------------------                                                                                     
 0|#  #  #  #  #  #  #  #  #  # ---------------> 0|18 18 18 11 12 13 18 18 18 18                                                                                     
 1|#  #  #  #  #  #  #  #  #  # ---------------> 1|18 19 19 12 13 14 19 19 19 18                                                                                     
 2|#  #  #  #  #  #  #  #  #  # ---------------> 2|18 19 20 11 13 15 20 20 19 18                                                                                     
-3|#  #  #  *  #  #  #  #  #  # ---------------> 3|11 12 11 0 8 10 16 16 15 14                                                                                     
-4|#  #  #  |  *  #  #  #  #  # ---------------> 4|12 13 13 8 0 8 14 15 14 13                                                                                     
-5|-  -  -  E  -  *  #  #  #  # ---------------> 5|13 14 15 [10]8 0 12 13 13 12                                                                                     
+3|#  #  #  *  #  #  #  #  #  # ---------------> 3|11 12 11 0 8 10 16 16 15 14                                                                                       
+4|#  #  #  |  *  #  #  #  #  # ---------------> 4|12 13 13 8 0 8 14 15 14 13                                                                                        
+5|-  -  -  E  -  *  #  #  #  # ---------------> 5|13 14 15 [10]8 0 12 13 13 12                                                                                      
 6|#  #  #  |  #  #  #  #  #  # ---------------> 6|18 19 20 16 14 12 21 20 19 18                                                                                     
 7|#  #  #  |  #  #  #  #  #  # ---------------> 7|18 19 20 16 15 13 20 20 19 18                                                                                     
 8|#  #  #  |  #  #  #  #  #  # ---------------> 8|18 19 19 15 14 13 19 19 19 18                                                                                     
