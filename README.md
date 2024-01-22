@@ -2,7 +2,7 @@
 
 ## Rules
 ### Intro
-1)Welcome to battleships! Here are the rules of the game :
+1) Welcome to battleships! Here are the rules of the game :
 
 Players each start by placing a few ships on a NxN grid.
 When we come to battle phase players take turns trying to guess where the enemy ships are.
@@ -11,6 +11,7 @@ and when a ship is completely destroyed, a message is displayed to confirm its s
 Game goes on until either player sinks all of their opponent's ships.
 
 ## Symbols (Characters) used in README and code
+2) Here's some symbols that are used throughout the game and README
 'S' - Ship                                                                                                                                                            
 '#' - Unknown Square of Grid                                                                                                                                          
 'X' - Known Square of Ship of Grid                                                                                                                                    
@@ -20,39 +21,41 @@ N - size of grid
 
 ### Placing ships
 3) The battlefield will be displayed in the following way during the phase of placing ships before each placement of a ship :
-   0  1  2  3  4  5  6  7  8  9
- ------------------------------
- 0|S  *  *  *  *  *  *  *  *  *
- 1|S  *  *  *  *  *  *  *  S  *
- 2|*  *  *  *  *  *  *  *  S  *
- 3|*  *  *  *  *  *  *  *  S  *
- 4|*  *  *  *  *  S  S  *  *  *
- 5|*  S  S  *  *  *  *  *  *  *
- 6|*  *  *  *  *  *  *  *  *  *
- 7|*  *  S  S  S  *  *  *  *  *
- 8|*  *  *  *  *  *  *  *  *  *
- 9|*  *  *  *  *  *  *  *  *  *
+   PLEASE USE RAW VERSION OF THE README FOR THIS VISUALIZATION :
+   
+   0  1  2  3  4  5  6  7  8  9                                                                                                                                       
+ ------------------------------                                                                                                                                       
+ 0|S  *  *  *  *  *  *  *  *  *                                                                                                                                       
+ 1|S  *  *  *  *  *  *  *  S  *                                                                                                                                       
+ 2|*  *  *  *  *  *  *  *  S  *                                                                                                                                       
+ 3|*  *  *  *  *  *  *  *  S  *                                                                                                                                       
+ 4|*  *  *  *  *  S  S  *  *  *                                                                                                                                       
+ 5|*  S  S  *  *  *  *  *  *  *                                                                                                                                       
+ 6|*  *  *  *  *  *  *  *  *  *                                                                                                                                       
+ 7|*  *  S  S  S  *  *  *  *  *                                                                                                                                       
+ 8|*  *  *  *  *  *  *  *  *  *                                                                                                                                       
+ 9|*  *  *  *  *  *  *  *  *  *                                                                                                                                       
 
 Placing ships works by entering 2 coordinates [x,y] and 1 character [H/V] for whether the ship will have a horizontal or vertical orientation.
 For instance the ship in the top left was obviously entered with [0 0 V] in the phase of placing the 2x1 ships
 
 ### Shooting
 4) After all ships have been placed we reach the phase of shooting where the 2 players take turns to make guesses
-The user will first get the known ships of the opponent that will look something like :
+The user will first get the known ships of the opponent that will look something like this :
+PLEASE USE RAW VERSION OF THE README FOR THIS VISUALIZATION :
 
-  0  1  2  3  4  5  6  7  8  9
- ------------------------------
-0|O  *  #  #  #  #  *  #  #  *
-1|O  #  *  #  #  #  #  *  O  #
-2|#  O  O  O  O  O  #  #  O  #
-3|#  #  #  *  #  #  #  #  O  #
-4|X  X  X  #  *  #  #  #  #  *
-5|*  O  O  #  #  *  #  #  #  #
-6|#  *  *  #  #  #  *  #  #  #
-7|#  #  O  O  O  #  #  *  #  #
-8|#  *  #  #  #  *  #  #  *  #
-9|*  #  #  *  O  O  O  O  #  *
-Taking a few seconds for user to read...
+  0  1  2  3  4  5  6  7  8  9                                                                                                                                        
+ ------------------------------                                                                                                                                       
+0|O  *  #  #  #  #  *  #  #  *                                                                                                                                        
+1|O  #  *  #  #  #  #  *  O  #                                                                                                                                        
+2|#  O  O  O  O  O  #  #  O  #                                                                                                                                        
+3|#  #  #  *  #  #  #  #  O  #                                                                                                                                        
+4|X  X  X  #  *  #  #  #  #  *                                                                                                                                        
+5|*  O  O  #  #  *  #  #  #  #                                                                                                                                        
+6|#  *  *  #  #  #  *  #  #  #                                                                                                                                        
+7|#  #  O  O  O  #  #  *  #  #                                                                                                                                        
+8|#  *  #  #  #  *  #  #  *  #                                                                                                                                        
+9|*  #  #  *  O  O  O  O  #  *                                                                                                                                        
 
 A legal shoot here would be [4 3] since it is free (unknown for now), [0 0] would be not since it's already a square that has been targeted in the past.
 If a shot is successful, there is a chance it completes a whole sunk ship in which case the game will print a message like :
@@ -65,7 +68,7 @@ Sunk ships :
 [2, 1] -> [2, 5]
 
 ### End of game
-5)
+5) The game ends when either player sinks all of the opponent's ships.
 At the end of the game a message will be displayed to say who won in how many moves and how far the other player was from winning.
 Further instructions are provided throughout the game. Enjoy playing!
 
