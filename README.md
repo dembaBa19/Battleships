@@ -4,13 +4,13 @@
 ## Rules
 
 ## Symbols (Characters) used in README and program
-'S' - Ship
-'#' - Unknown Square of Grid
-'X' - Known Square of Ship of Grid
-'O' - Known Sunk Square of Ship in Grid
-'*' - Known Nothing Square in Grid
+'S' - Ship                                                                                                                                                            
+'#' - Unknown Square of Grid                                                                                                                                          
+'X' - Known Square of Ship of Grid                                                                                                                                    
+'O' - Known Sunk Square of Ship in Grid                                                                                                                               
+'*' - Known Nothing Square in Grid                                                                                                                                    
 
-N - size of grid
+N - size of grid                                                                                                                                                      
 
 ## The Computer Algorithm
 ### Placing battleships
