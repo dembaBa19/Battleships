@@ -3,7 +3,7 @@
 
 ## Rules
 
-## Symbols (Characters) used in README and program
+## Symbols (Characters) used in README and code
 'S' - Ship                                                                                                                                                            
 '#' - Unknown Square of Grid                                                                                                                                          
 'X' - Known Square of Ship of Grid                                                                                                                                    
