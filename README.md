@@ -14,7 +14,7 @@ N - size of grid
 
 ## The Computer Algorithm
 ### Placing battleships
-The battleships are placed completely randomly.
+The battleships are placed completely randomly by the computer.
 
 ### Shooting
 For a classic game of battleships with the following settings :
