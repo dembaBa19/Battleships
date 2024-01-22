@@ -1,7 +1,14 @@
-# README to be finished
 # The game of battleships on c++
 
 ## Rules
+### Intro
+1)Welcome to battleships! Here are the rules of the game :
+
+Players each start by placing a few ships on a NxN grid.
+When we come to battle phase players take turns trying to guess where the enemy ships are.
+The input they give is coordinates [x,y] and only get an answer of whether it is a hit or miss
+and when a ship is completely destroyed, a message is displayed to confirm its squares.
+Game goes on until either player sinks all of their opponent's ships.
 
 ## Symbols (Characters) used in README and code
 'S' - Ship                                                                                                                                                            
@@ -9,8 +16,58 @@
 'X' - Known Square of Ship of Grid                                                                                                                                    
 'O' - Known Sunk Square of Ship in Grid                                                                                                                               
 '*' - Known Nothing Square in Grid                                                                                                                                    
+N - size of grid
 
-N - size of grid                                                                                                                                                      
+### Placing ships
+3) The battlefield will be displayed in the following way during the phase of placing ships before each placement of a ship :
+   0  1  2  3  4  5  6  7  8  9
+ ------------------------------
+ 0|S  *  *  *  *  *  *  *  *  *
+ 1|S  *  *  *  *  *  *  *  S  *
+ 2|*  *  *  *  *  *  *  *  S  *
+ 3|*  *  *  *  *  *  *  *  S  *
+ 4|*  *  *  *  *  S  S  *  *  *
+ 5|*  S  S  *  *  *  *  *  *  *
+ 6|*  *  *  *  *  *  *  *  *  *
+ 7|*  *  S  S  S  *  *  *  *  *
+ 8|*  *  *  *  *  *  *  *  *  *
+ 9|*  *  *  *  *  *  *  *  *  *
+
+Placing ships works by entering 2 coordinates [x,y] and 1 character [H/V] for whether the ship will have a horizontal or vertical orientation.
+For instance the ship in the top left was obviously entered with [0 0 V] in the phase of placing the 2x1 ships
+
+### Shooting
+4) After all ships have been placed we reach the phase of shooting where the 2 players take turns to make guesses
+The user will first get the known ships of the opponent that will look something like :
+
+  0  1  2  3  4  5  6  7  8  9
+ ------------------------------
+0|O  *  #  #  #  #  *  #  #  *
+1|O  #  *  #  #  #  #  *  O  #
+2|#  O  O  O  O  O  #  #  O  #
+3|#  #  #  *  #  #  #  #  O  #
+4|X  X  X  #  *  #  #  #  #  *
+5|*  O  O  #  #  *  #  #  #  #
+6|#  *  *  #  #  #  *  #  #  #
+7|#  #  O  O  O  #  #  *  #  #
+8|#  *  #  #  #  *  #  #  *  #
+9|*  #  #  *  O  O  O  O  #  *
+Taking a few seconds for user to read...
+
+A legal shoot here would be [4 3] since it is free (unknown for now), [0 0] would be not since it's already a square that has been targeted in the past.
+If a shot is successful, there is a chance it completes a whole sunk ship in which case the game will print a message like :
+[4, 0] -> [4, 3] has sunk!
+To avoid any confusion a list of the sunk ships will always be provided at each move before the player's guess like this :
+Sunk ships :
+[0, 0] -> [1, 0]
+[5, 1] -> [5, 2]
+...
+[2, 1] -> [2, 5]
+
+### End of game
+5)
+At the end of the game a message will be displayed to say who won in how many moves and how far the other player was from winning.
+Further instructions are provided throughout the game. Enjoy playing!
 
 ## The Computer Algorithm
 ### Placing battleships
@@ -26,7 +83,7 @@ For a classic game of battleships with the following settings :
   
 It will take you around 95/100 guesses on average if you shoot completely randomly.
 That's why if we were to invent an algorithm to play the game, we would have to make it significantly better in order to have a chance against humans.
-Our algorithm does it in only around 38 moves in this particular game settings and gets the upper hand against a human around 8/10 times!
+Our algorithm does it in only around 42 moves in these particular game settings and gets the upper hand against a human around 8/10 times!
 
 The algorithm in itself is divided into 2 parts due to the amount of time and space the complex algorithm requires. On each step we will calculate the steps the complex algorithm would take at most by the following formula - (NxNx2)^(battleships left unsunk). If the number we get is above 10M steps, the algorithm will be deemed too slow to be used and we will proceed with the simpler one.
 
