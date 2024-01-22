@@ -9,7 +9,7 @@
 * @idnumber 0MI0600330
 * @compiler GCC
 *
-* game of battleships
+* Game of Battleships
 *
 */
 
@@ -18,8 +18,8 @@
 #include<stdlib.h>
 #include<time.h>
 #include<random>
-#include<chrono>
-#include<thread>
+#include<windows.h>
+
 using namespace std;
 
 //default characters
@@ -71,6 +71,7 @@ struct Player {
     Ship* ships;
     int remainingShipsOfKind[4] = {0, 0, 0, 0};
     int remainingShipsTotalCount;
+    int remainingShipSquares;
 };
 
 //variable for game settings
@@ -82,6 +83,8 @@ struct Game {
     Player* player2;
     bool defaultSettings = false;
     int moveCount = 1;
+    bool regularMoveOrder = true;
+    bool slowMode = false;
 };
 
 Game game;
@@ -102,6 +105,11 @@ void walls(int i) {
 void lookAway() {
     walls(40);
     cout<<"\n";
+}
+
+int validCheckDigit(char input) {
+    if(input>= '0' && input <= '9') return (input - '0');
+    else return -666;
 }
 
 //find the other player
@@ -337,39 +345,75 @@ void rules() {
     }
 
     if(yesOrNo=='Y' || yesOrNo=='y') {
-        cout << "Welcome to battleships! Here are the rules of the game :\n"
+        cout << "\n1)Welcome to battleships! Here are the rules of the game :\n\n"
         << "Players each start by placing a few ships on a NxN grid.\n"
         << "When we come to battle phase players take turns trying to guess where the enemy ships are.\n"
-        << "The input they give is coordinates (x,y) and only get an answer of whether it is a hit or miss\n"
+        << "The input they give is coordinates [x,y] and only get an answer of whether it is a hit or miss\n"
         << "and when a ship is completely destroyed, a message is displayed to confirm its squares.\n"
-        << "Game goes on until either player sinks all of their opponent's ships.\n"
-        << "The battlefield will be displayed in the following way during the phase of placing ships :\n"
+        << "Game goes on until either player sinks all of their opponent's ships.\n";
+        if(game.slowMode) cout << "Taking a few seconds for user to read...\n\n";
+        if(game.slowMode) Sleep(20000);
+        walls(2);
+        cout << "2)Here are some symbols that will be used throughout the rules.\n"
+        << "Unless changed, they will be the same ones for the whole game :\n\n"
+        << "S - Ship in Grid\n"
+        << "# - Unknown Square of Grid\n"
+        << "X - Known Square of Ship of Grid\n"
+        << "O - Known Sunk Square of Ship in Grid\n"
+        << "* - Known Nothing Square in Grid\n";
+        if(game.slowMode) cout << "Taking a few seconds for user to read...\n\n";
+        if(game.slowMode) Sleep(15000);
+        walls(2);
+        cout << "3)The battlefield will be displayed in the following way during the phase of placing ships before each placement of a ship :\n"
+        << "   0  1  2  3  4  5  6  7  8  9\n"
+        << " ------------------------------\n"
+        << " 0|S  *  *  *  *  *  *  *  *  *\n"
+        << " 1|S  *  *  *  *  *  *  *  S  *\n"
+        << " 2|*  *  *  *  *  *  *  *  S  *\n"
+        << " 3|*  *  *  *  *  *  *  *  S  *\n"
+        << " 4|*  *  *  *  *  S  S  *  *  *\n"
+        << " 5|*  S  S  *  *  *  *  *  *  *\n"
+        << " 6|*  *  *  *  *  *  *  *  *  *\n"
+        << " 7|*  *  S  S  S  *  *  *  *  *\n"
+        << " 8|*  *  *  *  *  *  *  *  *  *\n"
+        << " 9|*  *  *  *  *  *  *  *  *  *\n\n"
+        << "Placing ships works by entering 2 coordinates [x,y] and 1 character [H/V] for whether the ship will have a horizontal or vertical orientation.\n"
+        << "For instance the ship in the top left was obviously entered with [0 0 V] in the phase of placing the 2x1 ships\n";
+        if(game.slowMode) cout << "Taking a few seconds for user to read...\n\n";
+        if(game.slowMode) Sleep(25000);
+        walls(2);
+        cout << "4)After all ships have been placed we reach the phase of shooting where the 2 players take turns to make guesses\n"
+        << "The user will first get the known ships of the opponent that will look something like : \n\n"
         << "  0  1  2  3  4  5  6  7  8  9\n"
-           " ------------------------------\n"
-           " 0|S  *  *  *  *  *  *  *  *  *\n"
-           " 1|S  *  *  *  *  *  *  *  " << symbolForShip <<"  *\n"
-           " 2|*  *  *  *  *  *  *  *  " << symbolForShip <<"  *\n"
-           " 3|*  *  *  *  *  *  *  *  " << symbolForShip <<"  *\n"
-           " 4|*  *  *  *  *  " << symbolForShip <<"  " << symbolForShip <<"  *  *  *\n"
-           " 5|*  " << symbolForShip <<"  " << symbolForShip <<"  *  *  *  *  *  *  *\n"
-           " 6|*  *  *  *  *  *  *  *  *  *\n"
-           " 7|*  *  " << symbolForShip <<"  " << symbolForShip <<"  " << symbolForShip <<"  *  *  *  *  *\n"
-           " 8|*  *  *  *  *  *  *  *  *  *\n"
-           " 9|*  *  *  *  *  *  *  *  *  *\n";
-        cout << "\n";
-
-/*          0  1  2  3  4  5  6  7  8  9
-  ------------------------------
-0|O  *  #  #  #  #  *  #  #  *
-1|O  #  *  #  #  #  #  *  O  #
-2|#  O  O  O  O  O  #  #  O  #
-3|#  #  #  *  #  #  #  #  O  #
-4|X  X  X  #  *  #  #  #  #  *
-5|*  O  O  #  #  *  #  #  #  #
-6|#  *  *  #  #  #  *  #  #  #
-7|#  #  O  O  O  #  #  *  #  #
-8|#  *  #  #  #  *  #  #  *  #
-9|*  #  #  *  O  O  O  O  #  **/
+        << " ------------------------------\n"
+        << "0|O  *  #  #  #  #  *  #  #  *\n"
+        << "1|O  #  *  #  #  #  #  *  O  #\n"
+        << "2|#  O  O  O  O  O  #  #  O  #\n"
+        << "3|#  #  #  *  #  #  #  #  O  #\n"
+        << "4|X  X  X  #  *  #  #  #  #  *\n"
+        << "5|*  O  O  #  #  *  #  #  #  #\n"
+        << "6|#  *  *  #  #  #  *  #  #  #\n"
+        << "7|#  #  O  O  O  #  #  *  #  #\n"
+        << "8|#  *  #  #  #  *  #  #  *  #\n"
+        << "9|*  #  #  *  O  O  O  O  #  *\n";
+        if(game.slowMode) cout << "Taking a few seconds for user to read...\n\n";
+        if(game.slowMode) Sleep(17000);
+        walls(2);
+        cout << "5)A legal shoot here would be [4 3] since it is free (unknown for now), [0 0] would be not since it's already a square that has been targeted in the past.\n"
+        << "If a shot is successful, there is a chance it completes a whole sunk ship in which case the game will print a message like :\n"
+        << "[4, 0] -> [4, 3] has sunk!\n"
+        << "To avoid any confusion a list of the sunk ships will always be provided at each move before the player's guess like this :\n"
+        << "Sunk ships :\n"
+        << "[0, 0] -> [1, 0]\n"
+        << "[5, 1] -> [5, 2]\n"
+        << "...\n"
+        << "[2, 1] -> [2, 5]\n";
+        if(game.slowMode) cout << "Taking a few seconds for user to read...\n\n";
+        if(game.slowMode) Sleep(25000);
+        walls(2);
+        cout << "6)At the end of the game a message will be displayed to say who won in how many moves and how far the other player was from winning.\n"
+        << "Further instructions will be provided throughout the game. Enjoy playing!\n\n";
+        walls(3);
     }
 
 }
@@ -412,24 +456,8 @@ void freeMemoryShips(Player& player) {
     delete[] player.ships;
 }
 
-//setting how many ships of each kind are in game
-void setShipCount() {
-    cout << "Remember, there must be at least one of each type and the total area of those ships can't be more than ";
-    cout << game.battlefieldSize*game.battlefieldSize*4/10 << "\n - 40% of the total battlefield area ("
-    << game.battlefieldSize*game.battlefieldSize << ").\nHow many boats? (1x2 ships) : ";
-    cin >> game.boatsCount;
-    cout << "How many submarines? (1x3 ships) : ";
-    cin >> game.submarinesCount;
-    cout << "How many destroyers? (1x4 ships) : ";
-    cin >> game.destroyersCount;
-    cout << "How many carriers? (1x5 ships) : ";
-    cin >> game.carriersCount;
-    game.shipsCount = game.boatsCount + game.submarinesCount + game.destroyersCount + game.carriersCount;
-
-}
-
 //inputting grid size and ship count
-void setSizeAndShipCount() {
+void setSize() {
     if(game.defaultSettings) {
         game.battlefieldSize = defaultGridSize;
     } else {
@@ -448,6 +476,31 @@ void setSizeAndShipCount() {
     allocateMemoryBattlefield(player1);
     allocateMemoryBattlefield(player2);
 
+}
+
+//setting how many ships of each kind are in game
+void enterShipCount() {
+    cout << "Remember, there must be at least one of each type!\n\n";
+    if(game.slowMode) Sleep(1500);
+    if(game.battlefieldSize != 5) {
+        cout << "Also the total area of those ships can't be more than \n"
+        << game.battlefieldSize*game.battlefieldSize*4/10 << "\n - 40% of the total battlefield area ("
+        << game.battlefieldSize*game.battlefieldSize << ").\n\n";
+    }
+    if(game.slowMode) Sleep(3000);
+    cout << "How many boats? (1x2 ships) : ";
+    cin >> game.boatsCount;
+    cout << "How many submarines? (1x3 ships) : ";
+    cin >> game.submarinesCount;
+    cout << "How many destroyers? (1x4 ships) : ";
+    cin >> game.destroyersCount;
+    cout << "How many carriers? (1x5 ships) : ";
+    cin >> game.carriersCount;
+    game.shipsCount = game.boatsCount + game.submarinesCount + game.destroyersCount + game.carriersCount;
+
+}
+
+void setShipCount() {
     if(game.defaultSettings) {
         game.boatsCount = defaultBoats;
         game.submarinesCount = defaultSubmarines;
@@ -455,14 +508,20 @@ void setSizeAndShipCount() {
         game.carriersCount = defaultCarriers;
     } else {
         cout << "Now set the amount of each type of ship that each player will have on their battlefield.\n";
-        setShipCount();
-
+        enterShipCount();
+        if(game.slowMode) Sleep(1500);
         int shipsArea = game.boatsCount*2 + game.submarinesCount*3 + game.destroyersCount*4 + game.carriersCount*5;
+        cout << "Total area = " << shipsArea << "\n";
+        walls(2);
+        if(game.slowMode) Sleep(1500);
+
         while(shipsArea > game.battlefieldSize*game.battlefieldSize*4/10 || game.boatsCount<1 || game.submarinesCount<1 || game.destroyersCount<1 || game.carriersCount<1) {
-            cout<<"\nUnfortunately that input doesn't meet the requirements. Please, try again.\n";
-            setShipCount();
-            int shipsArea = game.boatsCount*2 + game.submarinesCount*3 + game.destroyersCount*4 + game.carriersCount*5;
+            if(game.battlefieldSize == 5 && game.boatsCount == 1 && game.submarinesCount == 1 && game.destroyersCount == 1 && game.carriersCount == 1) break; //passes
+            cout<<"\nUnfortunately that input doesn't meet the requirements. Please, try again. Total area = " << shipsArea << "\n";
+            enterShipCount();
+            shipsArea = game.boatsCount*2 + game.submarinesCount*3 + game.destroyersCount*4 + game.carriersCount*5;
         }
+        player1.remainingShipSquares = player2.remainingShipSquares = shipsArea;
     }
 
     game.shipsCount = game.boatsCount + game.submarinesCount + game.destroyersCount + game.carriersCount;
@@ -487,7 +546,7 @@ void setSizeAndShipCount() {
 //choosing between player vs player or player vs computer gamemodes
 void chooseGameMode(int& mode, Player& player1, Player& player2) {
 
-    cout << "Now please choose a game mode between 1 and 2 :\n"
+    cout << "Now please choose a game mode between 1 and 3 :\n"
         "1 - Player vs. Player\n"
         "2 - Player vs. Computer\n"
         "3 - Computer vs Computer\n\n";
@@ -499,13 +558,20 @@ void chooseGameMode(int& mode, Player& player1, Player& player2) {
         } else {
             cout<<"Incorrect input! Please enter the number 1, 2 or 3!\n";
         }
-        cin >> mode;
+        char input;
+        cin >> input;
+        cout << "\n";
+        mode = validCheckDigit(input);
     } while(mode!=1 && mode!=2 && mode!=3);
+
+    if(mode == 2) cout << "Good luck against the computer! You'll need it!\n\n";
+    if(game.slowMode) Sleep(1500);
 
     if(mode==1 || mode==2) {
         player1.isHuman = true;
         cout << "Player 1 :\n";
         setHumanName(&player1);
+
     } else {
         player1.isHuman = false;
         player1.name = computerName1;
@@ -519,6 +585,40 @@ void chooseGameMode(int& mode, Player& player1, Player& player2) {
         cout << "Player 2 :\n";
         setHumanName(&player2);
     }
+    walls(3);
+    if(game.slowMode) Sleep(2000);
+
+}
+
+void slowOrNot() {
+    char yesOrNo;
+    cout << "Would you like for there to be pauses between moves so it's easier to follow? (Y/N)\n";
+    cin >> yesOrNo;
+
+    while(yesOrNo!='Y' && yesOrNo!='y' && yesOrNo!='N' && yesOrNo!='n') {
+        cout << "Incorrect input! Please enter Y for slower mode or N for no pauses\n";
+        cin >> yesOrNo;
+    }
+
+    if(yesOrNo=='Y' || yesOrNo=='y') game.slowMode = true;
+}
+
+//who goes first
+void setMoveOrder() {
+
+    cout << "OK. Now who goes first? Type :\n1 for " << game.player1->name
+    << "\n2 for " << game.player2->name << "\n";
+
+    char input;
+    cin >> input;
+    int first = validCheckDigit(input);
+    while(!(first == 1 || first == 2)) {
+        cout << "Please enter 1 or 2\n";
+        cin >> input;
+        first = validCheckDigit(input);
+    }
+
+    if(first == 2) game.regularMoveOrder = false;
 }
 
 //checking if the placement of the ship is legal
@@ -554,10 +654,8 @@ void placeShipOnBattlefield(char** battlefield, int x, int y, char direction, in
     for(int i = index; i < index + lengthOfShip; i++) {
         if(direction == 'H' || direction == 'h') {
             battlefield[x][i] = symbolForShip;
-            //cout << "placenah na " << x << ", " << i << "\n";
         } else {
             battlefield[i][y] = symbolForShip;
-            //cout << "placenah na " << i << ", " << y << "\n";
         }
     }
 
@@ -656,10 +754,11 @@ void computerPlaceShips(Player* player) {
 void humanPlaceShips(Player* player) {
     cout << "Time for " << player->name << " to place their ships!\n\n";
 
-    cout << "Please for each ship enter coordinates x and y ranging between 0 and " << game.battlefieldSize-1 << ", followed by a letter :\n";
-    cout << "H - for horizontal or\nV - for vertical\n\n";
-
     printBattlefield(player, true);
+
+    cout << "Please for each ship enter coordinates x and y ranging between 0 and " << game.battlefieldSize-1 << ", followed by a letter :\n"
+    << "H - for horizontal or\nV - for vertical\n"
+    << "Example input :\n0 0 H\n\n";
 
     int shipsPlacedIndex = 0;
 
@@ -695,9 +794,10 @@ void humanPlaceShips(Player* player) {
             //remove!!!
             //if((length != 2  && length != 3) || !game.defaultSettings) {
             if(true) {
-                cout << "Entering for " << typeName[i] << " number " << j+1 <<"\n";
+                cout << "Entering for " << typeName[i] << " number " << j+1 <<" :\n";
 
                 cin >> x >> y >> direction;
+                cout << "\n";
                 bool inputIsOk = (x>=0 && x<=game.battlefieldSize-1 && y>=0 && y<=game.battlefieldSize-1 &&
                          (direction=='H' || direction=='h' || direction=='V' || direction=='v'));
 
@@ -705,11 +805,13 @@ void humanPlaceShips(Player* player) {
                     if(inputIsOk) {
                         cout<< "\nIllegal Placement! Please take in consideration the other already placed ships and the dimensions of the battlefield!\n\n";
                         printBattlefield(player, true);
+                        if(game.slowMode) Sleep(3000);
                         cout<<"Please enter the values again :\n";
                     } else {
                         cout << "Incorrect input! Try again!\n";
                         cout << "Please for each ship enter coordinates x and y ranging between 0 and " << game.battlefieldSize-1 <<", followed by a letter :\n";
                         cout << "H - for horizontal or\nV - for vertical\n\n";
+                        if(game.slowMode) Sleep(3000);
                     }
                     cin >> x >> y >> direction;
                     inputIsOk = (x>=0 && x<=game.battlefieldSize-1 && y>=0 && y<=game.battlefieldSize-1 &&
@@ -736,11 +838,12 @@ void humanPlaceShips(Player* player) {
     }
 
     cout << "Affirmative!\n\n";
+    if(game.slowMode) Sleep(5000);
 }
 
 //deciding if the player is a human and placing ships
 void placeShips(Player* player) {
-    if(player->isHuman) humanPlaceShips(player); //remove!!!
+    if(player->isHuman) humanPlaceShips(player);
     else computerPlaceShips(player);
 }
 
@@ -846,11 +949,15 @@ void freeMemoryLongLongMatrix(long long** matrix) {
     delete[] matrix;
 }
 
+///functions that are part of the shooting logic
+
+//if in battlefield range
 bool legalCoordinates(int x, int y, int lengthOfShip, char dir) {
     if(dir == 'H')  return ((y + lengthOfShip <= game.battlefieldSize) ? true : false);
     else return ((x + lengthOfShip <= game.battlefieldSize) ? true : false);
 }
 
+//has to be an unknown square
 bool legalShoot(int x, int y, int lengthOfShip, char dir, char** knownField) {
     bool legal = legalCoordinates(x, y, lengthOfShip, dir);
     if(legal) {
@@ -892,12 +999,45 @@ bool thereIsKnownNotPlaced(char** ourGuess) {
     return false;
 }
 
+void printSunkShipsList(Player* otherPlayer) {
+    int amountOfSunk = game.shipsCount - otherPlayer->remainingShipsTotalCount;
+    if(amountOfSunk == 0) cout << otherPlayer->name << " has no sunk ships yet!\n";
+    else cout << otherPlayer->name << " has " << amountOfSunk << " sunk ship(s)!\n";
+    if(game.slowMode) Sleep(2000);
+
+    cout << otherPlayer->remainingShipsTotalCount << " remain in the game -> [boats, submarines, destroyers, carriers] = ["
+    << otherPlayer->remainingShipsOfKind[0] << ", "
+    << otherPlayer->remainingShipsOfKind[1] << ", "
+    << otherPlayer->remainingShipsOfKind[2] << ", "
+    << otherPlayer->remainingShipsOfKind[3] << "]\n\n";
+
+    if(game.slowMode) Sleep(1000);
+    if(amountOfSunk == 0) return ;
+
+    cout << "Here's a list of all the sunk ships :\n";
+    for(int i = 0; i < game.shipsCount; i++) {
+        if(otherPlayer->ships[i].sunk) {
+            int x = otherPlayer->ships[i].x;
+            int y = otherPlayer->ships[i].y;
+            int length = otherPlayer->ships[i].length;
+            Direction direction = otherPlayer->ships[i].direction;
+
+            cout << "[" << x << ", " << y << "] -> ["
+            << ((direction == Horizontal) ? (x) : (x + length - 1)) << ", "
+            << ((direction == Horizontal) ? (y + length - 1) : (y)) << "]\n";
+        }
+    }
+    cout << "\n";
+    if(game.slowMode) Sleep(1000);
+}
+
 void makeAGuess(Player* player, int guessX, int guessY) {
     Player* otherPlayer = otherPlayerFinder(player);
     otherPlayer->revealedByOpponent[guessX][guessY] = true;
 
     if(otherPlayer->battlefield[guessX][guessY] == symbolForShip) {
-        cout << "Great success! " << player->name << " hit " << otherPlayer->name << "'s ship on " << guessX << ", " << guessY << "!\n\n";
+        cout << "Great success! " << player->name << " hit " << otherPlayer->name << "'s ship on " << guessX << ", " << guessY << "!\n";
+        otherPlayer->remainingShipSquares--;
         Ship* ship = findShipByCoordinates(otherPlayer, guessX, guessY);
         bool sunk = true;
         if(ship->direction == Horizontal) {
@@ -928,7 +1068,7 @@ void makeAGuess(Player* player, int guessX, int guessY) {
             otherPlayer->remainingShipsOfKind[ship->length-2]--;
         }
     } else {
-        cout << "Miss! " << player->name << "'s attempt on " << otherPlayer->name << " at " << guessX << ", " << guessY << " was innacurate!\n\n";
+        cout << "Miss! " << player->name << "'s attempt on " << otherPlayer->name << " at " << guessX << ", " << guessY << " was innacurate!\n";
     }
 }
 
@@ -1180,18 +1320,28 @@ bool isComputerComplexAlgorithmFastEnough (int remainingShips) {
         speed*=multiplier;
         //threshold for too much time
         if(speed > threshold) {
-            cout << "Complex algorithm too slow for now\n\n";
+            cout << "Complex algorithm too slow for now. Proceeding with simple algorithm.\n";
+            cout << "Maybe if " << remainingShips << " more ships were sunk we could use complex algorithm...\n\n";
+            if(game.slowMode) Sleep(3000);
             return false;
         }
         remainingShips--;
     }
+
+    cout << "Shouldn't be a problem for complex algorithm!\n\n";
+    if(game.slowMode) Sleep(2000);
     return true;
 }
 
 void computerShoot(Player* player) {
+    cout << "Beginning of move number " << game.moveCount << " for " << player->name << "\n";
+    if(game.slowMode) Sleep(1000);
 
     Player* otherPlayer = otherPlayerFinder(player);
     printBattlefield(otherPlayer, false);
+
+    printSunkShipsList(otherPlayer);
+
     char** maskedField = maskedBattlefield(otherPlayer);
 
     long long** result;
@@ -1210,8 +1360,10 @@ void computerShoot(Player* player) {
 
     freeMemoryCharMatrix(maskedField);
 
+    //evaluation print
     cout << "Here is a sneak peek of the evaluation behind all squares on the grid by the computer:\n\n";
     printLongLongMatrix(result);
+    if(game.slowMode) Sleep(1000);
 
     int guessX = 0, guessY = 0;
     long long maxValue = 0;
@@ -1230,36 +1382,62 @@ void computerShoot(Player* player) {
     makeAGuess(player, guessX, guessY);
 
     freeMemoryLongLongMatrix(result);
+
+    cout << "Let's see how it's looking after shot!\n\n";
+    printBattlefield(otherPlayer, false);
+    if(game.slowMode) Sleep(1000);
+    cout << otherPlayer->remainingShipSquares << " / " << game.boatsCount*2 + game.submarinesCount*3 + game.destroyersCount*4 + game.carriersCount*5
+    << " ship squares remain to be hit! (";
+    cout << player->remainingShipSquares << " / " << game.boatsCount*2 + game.submarinesCount*3 + game.destroyersCount*4 + game.carriersCount*5
+    << " for " << otherPlayer->name << " to hit)\n";
+    cout << "End of move number " << game.moveCount << " for " << player->name << "\n";
+    walls(3);
+    if(game.slowMode) Sleep(1000);
 }
 
+//for shooting by human
 void humanShoot(Player* player) {
-
-    //cout << player->name << "\n"; //new code
-    cout << "Pick a square : \nEnter coordinates x and y to shoot!\n";
-
-    if(player->name == game.player1->name) cout << "Opponent is " << game.player2->name << "\n";
-    if(player->name == game.player2->name) cout << "Opponent is " << game.player1->name << "\n";
+    cout << "Beginning of move number " << game.moveCount << " for " << player->name << "\n";
+    if(game.slowMode) Sleep(1000);
 
     Player* otherPlayer = otherPlayerFinder(player);
 
     printBattlefield(otherPlayer, false);
+    printSunkShipsList(otherPlayer);
+
+    cout << "Pick a square : \nEnter coordinates x and y to shoot!\n";
 
     //check for incorrect input
-    int guessX = -8, guessY = -8;
+    int guessX = -666, guessY = -666;
+    //validating guess conditions
     while(!(guessX >= 0 && guessX < game.battlefieldSize && guessY >= 0 && guessY < game.battlefieldSize && otherPlayer->revealedByOpponent[guessX][guessY] == false)) {
-        if(!(guessX == -8 && guessY == -8)) cout << "Invalid input! Please make sure your guess is between 0 and " << game.battlefieldSize-1 << "!\n\n";;
+        if(!(guessX == -666 && guessY == -666)) cout << "Invalid input! Please make sure your guess is between 0 and " << game.battlefieldSize-1 << "!\n\n";;
         if(guessX >= 0 && guessX < game.battlefieldSize && guessY >= 0 && guessY < game.battlefieldSize) {
             cout << "You already guessed that square! Please try again!\n\n";
         }
         cin >> guessX >> guessY;
     }
-
+    cout << "\n";
+    if(game.slowMode) Sleep(1000);
     makeAGuess(player, guessX, guessY);
+
+    cout << "Let's see how it's looking after shot!\n\n";
+    printBattlefield(otherPlayer, false);
+    if(game.slowMode) Sleep(3000);
+    cout << otherPlayer->remainingShipSquares << " / " << game.boatsCount*2 + game.submarinesCount*3 + game.destroyersCount*4 + game.carriersCount*5
+    << " ship squares remain to be hit! (";
+    cout << player->remainingShipSquares << " / " << game.boatsCount*2 + game.submarinesCount*3 + game.destroyersCount*4 + game.carriersCount*5
+    << " for " << otherPlayer->name << " to hit)\n";
+    cout << "End of move number " << game.moveCount << " for " << player->name << "\n";
+    walls(3);
+    if(game.slowMode) Sleep(4000);
 }
 
+//distributing to other functions depending on level of humanity
 void shoot(Player* player) {
     if(!player->isHuman) {
         computerShoot(player);
+        if(game.slowMode) Sleep(2000);
     } else {
         humanShoot(player);
     }
@@ -1271,37 +1449,68 @@ int main() {
 
     addPlayersToGame();
 
+    slowOrNot();
     //intro
     pasteIntro();
 
     //rules
     rules();
+    walls(2);
 
     //Game settings
-    setSizeAndShipCount();
+    setSize();
+    walls(2);
+    setShipCount();
+    walls(2);
 
     //choosing between 3 gamemodes
     int mode;
     chooseGameMode(mode, player1, player2);
 
-    placeShips(&player1);
-    lookAway();
+    setMoveOrder();
+
+    if(game.regularMoveOrder) {
+        placeShips(&player1);
+        lookAway();
+    }
     placeShips(&player2);
     lookAway();
-
-    printBattlefield(&player2, false);
+    if(!game.regularMoveOrder) {
+        placeShips(&player1);
+        lookAway();
+    }
 
     while(player1.remainingShipsTotalCount > 0) {
-        shoot(&player1);
-        if((!player2.remainingShipsTotalCount > 0)) {
-            cout << player1.name << " wins! All of " << player2.name << "'s ships have sunk in " << game.moveCount+1 << " moves!\n";
-            break;
+        //regular move order case
+        if(game.regularMoveOrder) {
+            shoot(&player1);
+            if(player2.remainingShipsTotalCount == 0) {
+                cout << player1.name << " wins! All of " << player2.name << "'s ships have sunk in " << game.moveCount+1 << " moves!\n";
+                cout << player2.name << " lost! They had " << player1.remainingShipsTotalCount << " ship(s) left to sink and "
+                << player1.remainingShipSquares << " square(s) left to shoot!\n\n";
+                break;
+            }
         }
+
         shoot(&player2);
         game.moveCount++;
+
+        //if move order is reversed
+        if(!game.regularMoveOrder) {
+            shoot(&player1);
+            if((player2.remainingShipsTotalCount == 0)) {
+                cout << player1.name << " wins! All of " << player2.name << "'s ships have sunk in " << game.moveCount+1 << " moves!\n";
+                cout << player2.name << " lost! They had " << player1.remainingShipsTotalCount << " ship(s) left to sink and "
+                << player1.remainingShipSquares << " square(s) left to shoot!\n\n";
+                break;
+            }
+        }
     }
+
     if(player1.remainingShipsTotalCount == 0 ) {
         cout << player2.name << " wins! All of " << player1.name << "'s ships have sunk in " << game.moveCount << " moves!\n";
+        cout << player1.name << " lost! They had " << player2.remainingShipsTotalCount << " ship(s) left to sink and "
+        << player2.remainingShipSquares << " square(s) left to shoot!\n\n";
     }
 
     freeMemoryBattlefield(player1);
