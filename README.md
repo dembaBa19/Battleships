@@ -1,6 +1,5 @@
 # README to be finished
-# Battleships
-## The game of battleships on c++
+# The game of battleships on c++
 
 
 ## The Computer Algorithm
