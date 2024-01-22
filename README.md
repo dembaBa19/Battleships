@@ -24,7 +24,7 @@ N - size of grid
    PLEASE USE RAW VERSION OF THE README FOR THIS VISUALIZATION :
    
    0  1  2  3  4  5  6  7  8  9                                                                                                                                       
- ------------------------------                                                                                                                                       
+ ------------------------------>                                                                                                                                      
  0|S  *  *  *  *  *  *  *  *  *                                                                                                                                       
  1|S  *  *  *  *  *  *  *  S  *                                                                                                                                       
  2|*  *  *  *  *  *  *  *  S  *                                                                                                                                       
@@ -45,7 +45,7 @@ The user will first get the known ships of the opponent that will look something
 PLEASE USE RAW VERSION OF THE README FOR THIS VISUALIZATION :
 
   0  1  2  3  4  5  6  7  8  9                                                                                                                                        
- ------------------------------                                                                                                                                       
+ ------------------------------>                                                                                                                                      
 0|O  *  #  #  #  #  *  #  #  *                                                                                                                                        
 1|O  #  *  #  #  #  #  *  O  #                                                                                                                                        
 2|#  O  O  O  O  O  #  #  O  #                                                                                                                                        
